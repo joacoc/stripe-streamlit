@@ -1,13 +1,8 @@
 import streamlit as st
 import psycopg
-import altair as alt
 import threading
 import queue
-import pandas as pd
 import os
-from collections import defaultdict
-import altair as alt
-from vega_datasets import data
 
 # DATABASE_URL = "postgres://<USER>:<PASS>@<HOST>:6875/materialize?sslmode=require"
 DATABASE_URL = os.environ['DATABASE_URL']
