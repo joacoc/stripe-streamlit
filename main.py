@@ -3,6 +3,7 @@ import psycopg
 import threading
 import queue
 import os
+import streamlit.components.v1 as components
 
 # DATABASE_URL = "postgres://<USER>:<PASS>@<HOST>:6875/materialize?sslmode=require"
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -18,11 +19,12 @@ div {
 }
 
 div[data-testid="metric-container"] > div > div {
-    font-family: 'VT323' !important;;
+    font-family: 'VT323' !important;
+    font-size: 200% !important;
 }
 div[data-testid="metric-container"] > label[data-testid="stMetricLabel"] > div p {
    font-size: 200% !important;
-   font-family: 'VT323' !important;;
+   font-family: 'VT323' !important;
 }
 div[data-testid="metric-container"] > div[data-testid="stMetricDelta"] > div {
    font-size: 150% !important;
@@ -31,8 +33,11 @@ div[data-testid="metric-container"] > div[data-testid="stMetricDelta"] > div {
 """
 
 # Style the page
+st.set_page_config(
+    page_title="real-time", page_icon="🟢", initial_sidebar_state="collapsed"
+)
 st.markdown(style, unsafe_allow_html=True,)
-st.title('Stripe Dashboard')
+st.title('Real-time Dashboard')
 
 # Fetch using SUBSCRIBE and add to a queue.
 # Later we are going to process the queue and render the components
@@ -47,8 +52,11 @@ def fetch_data():
             SELECT total::text as "value", 'total_transactions' as "metric"  FROM total_transactions
             UNION ALL
             SELECT last_minute_total::text as "value", 'last_minute_total' as "metric"  FROM last_minute_transactions
+            UNION ALL
+            SELECT subscriptions::text as "value", 'total_subscriptions' as "metric" FROM total_subscriptions
+            UNION ALL
+            SELECT fraudulent::text as "value", 'total_fraudulent' as "metric" FROM total_fraudulent
         );"""):
-            # print(f"Row from database: {row}")  # Log the fetched row for debugging
             updates_queue.put(row)
 
 # Create a background thread to fetch data
@@ -60,6 +68,8 @@ if 'data' not in st.session_state:
     st.session_state['volume'] = None
     st.session_state['total_transactions'] = None
     st.session_state['transactions_per_minute'] = None
+    st.session_state['total_subscriptions'] = None
+    st.session_state['total_fraudulent'] = None
 
 # Placeholder
 ph = st.empty()
@@ -77,10 +87,15 @@ while True:
             # Append data to session state
             st.session_state[update[3]] = int(update[2])
             print("Update metrics!")  # Check if we're ever entering this block
-            ph.empty()
-            ph.markdown(style, unsafe_allow_html=True,)
-            col1, col2, col3 = ph.columns(3)
-            col1.metric(label="Volume", value=f"${st.session_state['volume']:n}", delta="%10")
-            col2.metric(label="Total transactions", value=st.session_state['total_transactions'], delta="%10 in the last minute")
-            col3.metric(label="Transactions per minute", value=st.session_state['transactions_per_minute'], help="Total transactions in the last minute.", delta="%5")
+            ph = ph.empty()
+            container = ph.container()
+            col1, col2, col3 = container.columns(3)
+            col2.metric(label="Volume", value=f"${st.session_state['volume']}", delta="%10")
 
+            col1, col2 = container.columns(2)
+            col1.metric(label="Total transactions", value=f"{st.session_state['total_transactions']}")
+            col2.metric(label="Transactions per minute", value=st.session_state['transactions_per_minute'], help="Total transactions in the last minute.")
+
+            col1, col2 = container.columns(2)
+            col1.metric(label="Total subscriptions", value=st.session_state['total_subscriptions'])
+            col2.metric(label="Fraudulent cases", value=st.session_state['total_fraudulent'])
