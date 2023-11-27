@@ -67,7 +67,7 @@ thread.start()
 if 'data' not in st.session_state:
     st.session_state['volume'] = None
     st.session_state['total_transactions'] = None
-    st.session_state['transactions_per_minute'] = None
+    st.session_state['last_minute_total'] = None
     st.session_state['total_subscriptions'] = None
     st.session_state['total_fraudulent'] = None
 
@@ -94,7 +94,7 @@ while True:
 
             col1, col2 = container.columns(2)
             col1.metric(label="Total transactions", value=f"{st.session_state['total_transactions']}")
-            col2.metric(label="Transactions per minute", value=st.session_state['transactions_per_minute'], help="Total transactions in the last minute.")
+            col2.metric(label="Transactions per minute", value=st.session_state['last_minute_total'], help="Total transactions in the last minute.")
 
             col1, col2 = container.columns(2)
             col1.metric(label="Total subscriptions", value=st.session_state['total_subscriptions'])
