@@ -90,7 +90,7 @@ while True:
             ph = ph.empty()
             container = ph.container()
             col1, col2, col3 = container.columns(3)
-            col2.metric(label="Volume", value=f"${st.session_state['volume']}", delta="%10")
+            col2.metric(label="Volume", value=f"${st.session_state['volume']}", delta="‎")
 
             col1, col2 = container.columns(2)
             col1.metric(label="Total transactions", value=f"{st.session_state['total_transactions']}")
