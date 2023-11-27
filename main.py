@@ -7,9 +7,7 @@ import os
 # DATABASE_URL = "postgres://<USER>:<PASS>@<HOST>:6875/materialize?sslmode=require"
 DATABASE_URL = os.environ['DATABASE_URL']
 
-# Style the page
-st.markdown(
-    """
+style = """
 <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet'>
 <style>
 body {
@@ -30,9 +28,10 @@ div[data-testid="metric-container"] > div[data-testid="stMetricDelta"] > div {
    font-size: 150% !important;
 }
 </style>
-""",
-    unsafe_allow_html=True,
-)
+"""
+
+# Style the page
+st.markdown(style, unsafe_allow_html=True,)
 st.title('Stripe Dashboard')
 
 # Fetch using SUBSCRIBE and add to a queue.
@@ -64,6 +63,7 @@ if 'data' not in st.session_state:
 
 # Placeholder
 ph = st.empty()
+ph.markdown(style, unsafe_allow_html=True,)
 
 while True:
     if not updates_queue.empty():
@@ -78,6 +78,7 @@ while True:
             st.session_state[update[3]] = int(update[2])
             print("Update metrics!")  # Check if we're ever entering this block
             ph.empty()
+            ph.markdown(style, unsafe_allow_html=True,)
             col1, col2, col3 = ph.columns(3)
             col1.metric(label="Volume", value=f"${st.session_state['volume']:n}", delta="%10")
             col2.metric(label="Total transactions", value=st.session_state['total_transactions'], delta="%10 in the last minute")
