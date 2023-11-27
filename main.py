@@ -14,15 +14,15 @@ body {
     background: '#000000';
 }
 div {
-    font-family: 'VT323';
+    font-family: 'VT323' !important;;
 }
 
 div[data-testid="metric-container"] > div > div {
-    font-family: 'VT323';
+    font-family: 'VT323' !important;;
 }
 div[data-testid="metric-container"] > label[data-testid="stMetricLabel"] > div p {
    font-size: 200% !important;
-   font-family: 'VT323';
+   font-family: 'VT323' !important;;
 }
 div[data-testid="metric-container"] > div[data-testid="stMetricDelta"] > div {
    font-size: 150% !important;
